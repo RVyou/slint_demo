@@ -1,0 +1,26 @@
+import {  Button } from "std-widgets.slint";
+
+struct TestStruct {
+    I :int,
+    B:string,
+}
+
+
+export component MainWindow inherits Window {
+    in-out property <int> name :11;
+    in-out property <[int]> name_a ;
+    in-out property <TestStruct> structaa ;
+    callback testaa(int);
+    public function testaab(i:int)->string {
+       return  "testaab"+i;
+    }
+    no-frame: true;
+    always-on-top: false;
+    Button {
+        text: "aa";
+        clicked => {
+            root.testaa(1);
+        }
+    }
+
+}

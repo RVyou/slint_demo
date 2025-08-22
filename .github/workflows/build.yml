@@ -1,0 +1,122 @@
+#
+#name: Deploy
+#
+#permissions:
+#  contents: write
+#
+#on:
+#  push:
+#    tags:
+#      # Regex for a version number such as 0.2.1
+#      - "[0-9]+.[0-9]+.[0-9]+"
+#
+## 工作流由一个或多个作业( job )组成，这些作业可以顺序运行也可以并行运行
+#jobs:
+#  # 当前的工作流仅包含一个作业，作业 id 是 "build"
+#  build:
+#    # 作业名称
+#    name: build rust action
+#    # 执行作业所需的运行器 runner
+#    runs-on: windows-latest
+#
+#    # steps 代表了作业中包含的一系列可被执行的任务
+#    steps:
+#      # 在 $GITHUB_WORKSPACE 下 checks-out 当前仓库，这样当前作业就可以访问该仓库
+#      - uses: actions/checkout@v2
+#
+#      # 使用运行器的终端来运行一个命令
+#      - name: Run a one-line script
+#        run: echo Hello, world!
+#
+#      # 使用运行器的终端运行一组命令
+#      - name: Run a multi-line script
+#        run: |
+#          echo Add other actions to build,
+#          echo test, and deploy your project.
+name: build
+
+permissions:
+  contents: write
+
+on:
+  push:
+    tags:
+      # Regex for a version number such as 0.2.1
+      - "[0-9]+.[0-9]+.[0-9]+"
+jobs:
+  build:
+    name: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        build: [windows] #[linux, macos, windows]
+        include:
+#          - build: linux
+#            os: ubuntu-18.04
+#            rust: nightly
+#            target: x86_64-unknown-linux-musl
+#            archive-name: slint_demo-linux.tar.gz
+#          - build: macos
+#            os: macos-latest
+#            rust: nightly
+#            target: x86_64-apple-darwin
+#            archive-name: slint_demo-macos.tar.gz
+          - build: windows
+            os: windows-latest
+            rust: nightly-x86_64-msvc
+            target: x86_64-pc-windows-msvc
+            archive-name: slint_demo-windows
+      fail-fast: false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Get the release version from the tag
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+          profile: minimal
+          override: true
+          target: ${{ matrix.target }}
+
+      - name: Build binary
+        run: cargo build --verbose --release --target ${{ matrix.target }}
+        env:
+          RUST_BACKTRACE: 1
+
+      - name: Strip binary (linux and macos)
+        if: matrix.build == 'linux' || matrix.build == 'macos'
+        run: strip "target/${{ matrix.target }}/release/slint_demo"
+
+      - name: Build archive
+        shell: bash
+        run: |
+          mkdir archive
+          cd archive
+          if [ "${{ matrix.build }}" = "windows" ]; then
+            output="${{ matrix.archive-name }}_${{ env.VERSION }}.7z"
+            cp "../target/${{ matrix.target }}/release/slint_demo.exe" ./
+            7z a "$output" slint_demo.exe
+            cp $output ..
+            echo "ASSET=$output" >> $GITHUB_ENV
+          else
+            output="${{ matrix.archive-name }}_${{ env.VERSION }}.tar.gz"
+            cp "../target/${{ matrix.target }}/release/slint_demo" ./
+            tar -czf "$output" slint_demo
+            cp $output ..
+            echo "ASSET=$output" >> $GITHUB_ENV
+          fi
+
+
+      - name: Upload the package
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            ${{ env.ASSET }}
+
