@@ -1,0 +1,118 @@
+import { AppConfig, GlobalCallBack } from "global.slint";
+
+export component top_menu inherits Rectangle {
+    callback drag_window(x: length, y: length);
+    background: #1e1e2e;
+    height: 40px;
+    fs := FocusScope { }
+
+    // 拖拽区域覆盖整个标题栏
+    TouchArea {
+        moved => {
+            root.drag_window(self.mouse-x - self.pressed-x, self.mouse-y - self.pressed-y);
+        }
+        clicked => {
+            fs.focus();
+        }
+    }
+
+    HorizontalLayout {
+        padding-left: 14px;
+
+        // 应用名称
+        Text {
+            vertical-alignment: center;
+            height: 100%;
+            color: #cdd6f4;
+            font-size: AppConfig.font_size;
+            font-weight: 600;
+            text: AppConfig.app_name;
+        }
+
+        // 弹簧占位
+        Rectangle {
+            horizontal-stretch: 1;
+        }
+
+        // ===== 最小化按钮 =====
+        min-btn := Rectangle {
+            width: 46px;
+            height: 100%;
+            background: min-touch.has-hover ? #3b3b52 : transparent;
+
+            min-touch := TouchArea {
+                mouse-cursor: pointer;
+                clicked => {
+                    GlobalCallBack.minimize();
+                }
+            }
+
+            HorizontalLayout {
+                alignment: center;
+                VerticalLayout {
+                    alignment: center;
+                    Image {
+                        width: 12px;
+                        height: 12px;
+                        source: @image-url("../images/min.svg");
+                        colorize: #cdd6f4;
+                    }
+                }
+            }
+        }
+
+        // ===== 最大化/恢复按钮 =====
+        max-btn := Rectangle {
+            width: 46px;
+            height: 100%;
+            background: max-touch.has-hover ? #3b3b52 : transparent;
+
+            max-touch := TouchArea {
+                mouse-cursor: pointer;
+                clicked => {
+                    GlobalCallBack.maximize();
+                }
+            }
+
+            HorizontalLayout {
+                alignment: center;
+                VerticalLayout {
+                    alignment: center;
+                    Image {
+                        width: 12px;
+                        height: 12px;
+                        source: @image-url("../images/max.svg");
+                        colorize: #cdd6f4;
+                    }
+                }
+            }
+        }
+
+        // ===== 关闭按钮 =====
+        close-btn := Rectangle {
+            width: 46px;
+            height: 100%;
+            background: close-touch.has-hover ? #e81123 : transparent;
+
+            close-touch := TouchArea {
+                mouse-cursor: pointer;
+                clicked => {
+                    GlobalCallBack.close();
+                }
+            }
+
+            HorizontalLayout {
+                alignment: center;
+                VerticalLayout {
+                    alignment: center;
+                    Image {
+                        width: 12px;
+                        height: 12px;
+                        source: @image-url("../images/close.svg");
+                        colorize: close-touch.has-hover ? #ffffff : #cdd6f4;
+                    }
+                }
+            }
+        }
+    }
+}

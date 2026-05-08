@@ -1,27 +1,18 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+use lib::ui::window::*;
+use slint::SharedString;
 
-use slint::{Model, VecModel};
+fn main() {
+    let g = slint_init();
+    g.init_global();
+    let w = g.main_window.as_weak();
+    std::thread::spawn(move || {
+        std::thread::sleep(std::time::Duration::from_secs(2));
 
-
-slint::include_modules!();
-
-fn main() -> Result<(), slint::PlatformError> {
-
-    let main_window = MainWindow::new()?;
-    let aa = main_window.get_name();
-    println!("aa: {}", aa);
-    main_window.on_testaa(|tt: i32| {
-
-        println!("testaa{}", tt);
-    });
-    main_window.invoke_testaa(101);
-    main_window.set_structaa(TestStruct{
-        I :12,
-        B:"asd".into(),
+        w.upgrade_in_event_loop(|w| {
+            w.set_aa(SharedString::from("aaaa"));
+        })
     });
 
-   let mut data =  main_window.get_name_a();
-    let _a =data.as_any().downcast_ref::<VecModel<i32>>();//VecModel<i32> VecModel<SharedString>
-    main_window.run()
-
+    g.run();
 }

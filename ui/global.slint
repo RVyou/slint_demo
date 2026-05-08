@@ -1,0 +1,12 @@
+// 顶部拖拽控制 + 窗口操作
+export global GlobalCallBack {
+    callback drag_window(x: length, y: length);
+    callback minimize();
+    callback maximize();
+    callback close();
+}
+
+export global AppConfig {
+    out property <string> app_name: "slint demo";
+    out property <length> font_size: 14px;
+}

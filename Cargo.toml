@@ -4,10 +4,12 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-slint = {version = "1.12.1",features = ["backend-winit"]}
+slint = { version = "1.15.1", features = ["backend-winit"] }
+log = "0.4.27"
 
 [build-dependencies]
-slint-build = "1.12.1"
+slint-build = "1.15.1"
 
-
-
+[lib]
+name = "lib"
+path = "src/lib.rs"

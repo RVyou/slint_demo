@@ -52,15 +52,15 @@ jobs:
         build: [windows] #[linux, macos, windows]
         include:
 #          - build: linux
-#            os: ubuntu-18.04
+#            os: ubuntu-latest
 #            rust: nightly
 #            target: x86_64-unknown-linux-musl
-#            archive-name: slint_demo-linux.tar.gz
+#            archive-name: slint_demo-linux
 #          - build: macos
 #            os: macos-latest
 #            rust: nightly
 #            target: x86_64-apple-darwin
-#            archive-name: slint_demo-macos.tar.gz
+#            archive-name: slint_demo-macos
           - build: windows
             os: windows-latest
             rust: nightly-x86_64-msvc

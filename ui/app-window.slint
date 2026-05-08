@@ -1,26 +1,44 @@
-import {  Button } from "std-widgets.slint";
-
-struct TestStruct {
-    I :int,
-    B:string,
-}
-
+import { top_menu } from "top_menu.slint";
+import { GlobalCallBack }  from "global.slint";
+export { GlobalCallBack }
 
 export component MainWindow inherits Window {
-    in-out property <int> name :11;
-    in-out property <[int]> name_a ;
-    in-out property <TestStruct> structaa ;
-    callback testaa(int);
-    public function testaab(i:int)->string {
-       return  "testaab"+i;
-    }
-    no-frame: true;
-    always-on-top: false;
-    Button {
-        text: "aa";
-        clicked => {
-            root.testaa(1);
+    in-out property <string> aa: "as";
+    min-width: 1280px;
+    min-height: 720px;
+
+    background: transparent;
+    icon: @image-url("../images/8666681_edit_icon.png");
+    no-frame: true; // 取消自带窗口标题栏
+
+    // 主窗口容器
+    window := Rectangle {
+        background: #fff;
+
+        VerticalLayout {
+            padding: 0;
+            spacing: 0;
+
+            top_menu {
+                drag_window(x, y) => {
+                    GlobalCallBack.drag_window(x, y)
+                }
+            }
+
+            // 内容区域
+            content := Rectangle {
+                horizontal-stretch: 1;
+                vertical-stretch: 1;
+                background: #f5f5f7;
+
+                Text {
+                    x: 0;
+                    y: 0;
+                    text: aa;
+                    color: #333;
+                    font-size: 16px;
+                }
+            }
         }
     }
-
 }
