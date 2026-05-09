@@ -1,9 +1,8 @@
 import { top_menu } from "top_menu.slint";
-import { GlobalCallBack }  from "global.slint";
-export { GlobalCallBack }
+import { GlobalCallBack,AppConfig }  from "global.slint";
+export { GlobalCallBack,AppConfig }
 
 export component MainWindow inherits Window {
-    in-out property <string> aa: "as";
     min-width: 1280px;
     min-height: 720px;
 
@@ -27,17 +26,7 @@ export component MainWindow inherits Window {
 
             // 内容区域
             content := Rectangle {
-                horizontal-stretch: 1;
-                vertical-stretch: 1;
-                background: #f5f5f7;
 
-                Text {
-                    x: 0;
-                    y: 0;
-                    text: aa;
-                    color: #333;
-                    font-size: 16px;
-                }
             }
         }
     }
